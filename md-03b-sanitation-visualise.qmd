@@ -1,7 +1,7 @@
 ---
 title: "Data transformation with dplyr"
 subtitle: "And make a plot"
-author: ""
+author: "leomeili"
 format:
   html:
     embed-resources: true
@@ -45,9 +45,10 @@ sanitation <- read_csv("data/jmp_wld_sanitation_long.csv")
 1.  Run all code chunks above.
 2.  Use the `glimpse()` function to get an overview of the data set.
 3.  How many variables are in the data set?
+    -   there are 8 variables
 
 ```{r}
-
+glimpse(sanitation)
 ```
 
 ## Task 2
@@ -55,7 +56,8 @@ sanitation <- read_csv("data/jmp_wld_sanitation_long.csv")
 1.  Use the `count()` function with varname_short and varname_long to identify the definitions of the levels in these two variables.
 
 ```{r}
-
+sanitation %>% 
+  count(varname_short, varname_long)
 ```
 
 ## Task 3
@@ -69,6 +71,10 @@ sanitation <- read_csv("data/jmp_wld_sanitation_long.csv")
 2.  Store the result as a new object in your environment with a name of your choice.
 
 ```{r}
+sanitation_por_0020 <- sanitation %>% 
+  filter(name == 'Portugal',
+         year == 2000 | year == 2020,
+         varname_short != 'san_sm')
 
 ```
 
@@ -77,6 +83,8 @@ sanitation <- read_csv("data/jmp_wld_sanitation_long.csv")
 1.  Use the `count()` function with the data you created in Task 3 to verify that year 2000 and 2020 remained in the year variable.
 
 ```{r}
+sanitation_por_0020 %>% 
+  count(year)
 
 ```
 
@@ -100,7 +108,17 @@ geom_text(aes(label = round(percent, 1)),
 ```
 
 ```{r}
-
+ggplot(data = sanitation_por_0020,
+       mapping = aes(x = residence,
+                     y = percent,
+                     fill = varname_long)) +
+  geom_col() +
+  facet_wrap(~year) +
+  scale_fill_colorblind() +
+  geom_text(aes(label = round(percent, 1)), 
+          position = position_stack(vjust = 0.5),
+          size = 3,
+          color = "white") 
 ```
 
 ## Task 6
@@ -108,13 +126,17 @@ geom_text(aes(label = round(percent, 1)),
 If you haven't worked with JMP indicators before, the following questions will be challenging to answer.
 
 1.  Look at the plot that you created. What do you notice about the order of the bars / order of the legend?
+    -   it's the same order, no matter what percentages there are.
 2.  What would you want to change?
+    -   focus on the changes, which in my plot are difficult to decipher. as in zoom in on the ones other than 'basic sanitation services'
 3.  Why did we remove "safely managed sanitation services" from the data set in Task 3?
+    -   I'm not sure what they represent in this data, so I don't have an answer for this. I could guess that they might be irrelevant from a percentage point of view relative to the others?
 
 ## Task 7
 
 1.  Run the code in the code chunk below.
 2.  What do you observe when you look at the code and plot?
+    -   the variable 'san_bas' is complementary to the variables 'san_lim', 'san_od' and 'san_unimp', as they all together make 100%. san_sm however is not in these 100%, so seperate from the other variables. else, there is much data to go by just for the year 2020.
 
 ```{r}
 
